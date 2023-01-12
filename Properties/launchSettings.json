@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Trinity (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Trinity (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
