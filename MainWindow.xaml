@@ -12,6 +12,7 @@
     Closed="Window_Closed">
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
+        <Button x:Name="SongPickButton" Click="SongPickButton_Click">Pick a song</Button>
+        <Button x:Name="PlayPauseButton" Click="PlayPauseButton_Click">Play</Button>
     </StackPanel>
 </Window>
