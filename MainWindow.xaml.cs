@@ -8,6 +8,8 @@ using CSCore.Codecs.OPUS;
 using System.IO;
 using NetDiscordRpc;
 using System.Linq;
+using Windows.Storage.Pickers;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,7 +38,16 @@ namespace Trinity
         private void myButton_Click(object sender, RoutedEventArgs e)
         {
             myButton.Content = "Clicked";
-            string filePath = "test.opus";
+            var filePicker = new FileOpenPicker() {SuggestedStartLocation = PickerLocationId.MusicLibrary};
+            filePicker.FileTypeFilter.Add("*");
+            // Get the current window's HWND by passing in the Window object
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+
+            // Associate the HWND with the file picker
+            WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
+            var task = filePicker.PickSingleFileAsync().AsTask();
+            task.Wait();
+            var filePath = task.Result.Path;
             string fileName = filePath.Split('\\').Last().Split('.')[0];
             /*using (var mmdeviceEnumerator = new MMDeviceEnumerator())
             {
