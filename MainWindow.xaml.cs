@@ -1,20 +1,15 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using CSCore.Codecs;
+using CSCore;
+using CSCore.CoreAudioAPI;
+using CSCore.SoundOut;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
+using CSCore.Codecs.OPUS;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using NetDiscordRpc;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,6 +29,32 @@ namespace Trinity
         private void myButton_Click(object sender, RoutedEventArgs e)
         {
             myButton.Content = "Clicked";
+            string file = "test.opus";
+            using (var mmdeviceEnumerator = new MMDeviceEnumerator())
+            {
+                using (
+                    var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
+                {
+                    //foreach (var device in mmdeviceCollection)
+                    var device = mmdeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                    var soundOut = new WasapiOut() { Device = device };
+                    var waveSource = new OpusSource(File.OpenRead(file), 48000, 2);
+                    soundOut.Initialize(waveSource);
+
+                    soundOut.Play();
+
+
+                    var rpc = new DiscordRPC("757258842328399944");
+                    rpc.Initialize();
+                    rpc.SetPresence(new NetDiscordRpc.RPC.RichPresence()
+                    {
+                        Details = "Details",
+                        State = "State"
+                    });
+
+                    rpc.Invoke();
+                }
+            }
         }
     }
 }
