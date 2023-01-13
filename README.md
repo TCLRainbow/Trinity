@@ -13,3 +13,4 @@ However I might add other features if I have the energy to do so.
 * Other audio codecs
 * Video playback support
 * YouTube streams support
+* Custom activity ("Listening to Trinity", breaks ToS)
