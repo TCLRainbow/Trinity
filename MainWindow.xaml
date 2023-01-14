@@ -11,8 +11,16 @@
     mc:Ignorable="d"
     Closed="Window_Closed">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="SongPickButton" Click="SongPickButton_Click">Pick a song</Button>
-        <Button x:Name="PlayPauseButton" Click="PlayPauseButton_Click">Play</Button>
-    </StackPanel>
+    <Grid Margin="35" Background="#0C0C0C">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Background="Green">
+            <Button x:Name="SongPickButton" Click="SongPickButton_Click"
+                Margin="20" Background="#1A1A23">Pick a song</Button>
+            <Button x:Name="PlayPauseButton" Click="PlayPauseButton_Click" Background="#1A1A23">Play</Button>
+        </StackPanel>
+        
+    </Grid>
 </Window>
