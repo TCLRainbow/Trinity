@@ -10,6 +10,7 @@ using NetDiscordRpc;
 using System.Linq;
 using Windows.Storage.Pickers;
 using System;
+using NetDiscordRpc.RPC;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -76,17 +77,26 @@ namespace Trinity
 
         private void PlayNewSong()
         {
-            var waveSource = new OpusSource(File.OpenRead(filePath), 48000, 2);
+            var file = new FileInfo(filePath);
+            var waveSource = new OpusSource(file.OpenRead(), 48000, 2);
+            
             wasapi.Initialize(waveSource);
             wasapi.Play();
             PlayPauseButton.Content = "Pause";
 
+            var bit = waveSource.WaveFormat.BitsPerSample * waveSource.WaveFormat.Channels;
+            var sampleRate = waveSource.WaveFormat.SampleRate / 1000;
+            var bps = (file.Length - waveSource.WaveFormat.ExtraSize) / (waveSource.Length / 200000) / 125;
+
+
             string fileName = filePath.Split('\\').Last().Split('.')[0];
-            rpc.SetPresence(new NetDiscordRpc.RPC.RichPresence()
+            rpc.SetPresence(new RichPresence()
             {
+
                 Details = fileName,
-                State = "32bit 48kHz",
-                Assets = new NetDiscordRpc.RPC.Assets()
+                State = $"{bit}bit {sampleRate}kHz {bps}kbps",
+                Timestamps = Timestamps.Now,
+                Assets = new Assets()
                 {
                     LargeImageKey = "https://i.imgur.com/IvGkGfr.png"
                 }
