@@ -24,20 +24,21 @@ namespace Trinity
     public sealed partial class MainWindow : Window
     {
         private static WasapiOut wasapi = new() { Device = MMDeviceEnumerator.DefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)};
-        private static string filePath;
         private static DiscordRPC rpc = new("757258842328399944");
+        private static bool loop = true;
+        private static string filePath;
 
         public MainWindow()
         {
             InitializeComponent();
             rpc.Initialize();
+            wasapi.Stopped += Wasapi_Stopped;
         }
 
 
         /*
          * Notes
          * https://github.com/filoe/cscore/tree/master/Samples/AudioPlayerSample
-         * https://www.nuget.org/packages/NetDiscordRpc
          * 
          * using (var mmdeviceEnumerator = new MMDeviceEnumerator())
          *   {
@@ -78,15 +79,15 @@ namespace Trinity
         private void PlayNewSong()
         {
             var file = new FileInfo(filePath);
-            var waveSource = new OpusSource(file.OpenRead(), 48000, 2);
-            
-            wasapi.Initialize(waveSource);
+            var src = new OpusSource(file.OpenRead(), 48000, 2);
+
+            wasapi.Initialize(src);
             wasapi.Play();
             PlayPauseButton.Content = "Pause";
 
-            var bit = waveSource.WaveFormat.BitsPerSample * waveSource.WaveFormat.Channels;
-            var sampleRate = waveSource.WaveFormat.SampleRate / 1000;
-            var bps = (file.Length - waveSource.WaveFormat.ExtraSize) / (waveSource.Length / 200000) / 125;
+            var bit = src.WaveFormat.BitsPerSample * src.WaveFormat.Channels;
+            var sampleRate = src.WaveFormat.SampleRate / 1000;
+            var bps = (file.Length - src.WaveFormat.ExtraSize) / (src.Length / 200000) / 125;
 
 
             string fileName = filePath.Split('\\').Last().Split('.')[0];
@@ -101,8 +102,17 @@ namespace Trinity
                     LargeImageKey = "https://i.imgur.com/IvGkGfr.png"
                 }
             });
-
             rpc.Invoke();
+        }
+
+        private void Wasapi_Stopped(object sender, PlaybackStoppedEventArgs e)
+        {
+            if (loop)
+            {
+                wasapi.Initialize(new OpusSource(File.OpenRead(filePath), 48000, 2));
+                wasapi.Play();
+                rpc.UpdateTimestamps(Timestamps.Now);
+            }
         }
 
         private void Window_Closed(object sender, WindowEventArgs args)
